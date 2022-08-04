@@ -4,8 +4,8 @@ gcflags := -G=3
 flags := -ldflags=${ldflags} -gcflags=${gcflags}
 
 .PHONY: build
-build: bin clean vendor fmt credentials
-	go build ${flags} -o bin cmd/run/run.go
+build: bin clean vendor fmt
+	go build ${flags} -o bin cmd/run.go
 
 bin:
 	mkdir -p bin
