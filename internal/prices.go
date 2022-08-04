@@ -83,17 +83,21 @@ func streamPrices(file *os.File, inCh chan<- []types.Price, errs chan<- error) {
 }
 
 func calculateMaxEarnings(prices []types.Price) types.Price {
+	if len(prices) == 0 {
+		return 0
+	}
+
 	var maxDiff types.Price = 0
+	var minValue types.Price = prices[0]
 
 	for i := 0; i < len(prices); i++ {
-		for j := i + 1; j < len(prices); j++ {
-			start := prices[i]
-			end := prices[j]
+		if minValue > prices[i] {
+			minValue = prices[i]
+		}
 
-			diff := end - start
-			if diff > maxDiff {
-				maxDiff = diff
-			}
+		diff := prices[i] - minValue
+		if diff > maxDiff {
+			maxDiff = diff
 		}
 	}
 
