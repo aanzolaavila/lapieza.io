@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/aanzolaavila/lapieza.io/internal/types"
 )
@@ -34,6 +35,10 @@ func getPricesFromLine(line string) ([]types.Price, error) {
 
 	strs := strings.Split(line, " ")
 	for _, strNumber := range strs {
+		if strNumber == "" {
+			continue
+		}
+
 		num, err := strconv.ParseInt(strNumber, 10, 64)
 
 		if err != nil {
@@ -48,6 +53,10 @@ func getPricesFromLine(line string) ([]types.Price, error) {
 
 func streamPrices(file *os.File, inCh chan<- []types.Price, errs chan<- error) {
 	scanner := bufio.NewScanner(file)
+
+	const maxCapacity int = 10 * 1024 * 1024 // 10 MB
+	buf := make([]byte, maxCapacity)
+	scanner.Buffer(buf, maxCapacity)
 
 	defer close(inCh)
 	defer close(errs)
@@ -97,6 +106,22 @@ func processPrices(inCh <-chan []types.Price, outCh chan<- types.Price) {
 	}
 }
 
+func processPricesConcurrent(inCh <-chan []types.Price, outCh chan<- types.Price) {
+	const goroutines = 5
+
+	var wg sync.WaitGroup
+	wg.Add(goroutines)
+	for i := 0; i < goroutines; i++ {
+		go func() {
+			processPrices(inCh, outCh)
+			wg.Done()
+		}()
+	}
+
+	wg.Wait()
+	close(outCh)
+}
+
 func ProcessPricesFromFile(file *os.File) (<-chan types.Price, <-chan error) {
 	inCh := make(chan []types.Price)
 	outCh := make(chan types.Price)
@@ -107,7 +132,7 @@ func ProcessPricesFromFile(file *os.File) (<-chan types.Price, <-chan error) {
 	}()
 
 	go func() {
-		processPrices(inCh, outCh)
+		processPricesConcurrent(inCh, outCh)
 	}()
 
 	return outCh, errs

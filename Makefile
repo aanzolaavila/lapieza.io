@@ -1,18 +1,20 @@
-git-commit := $(shell git rev-list -1 HEAD)
-ldflags := "-s -w -X main.GitCommit=${git-commit}"
+ldflags := "-s -w"
 gcflags := -G=3
 flags := -ldflags=${ldflags} -gcflags=${gcflags}
 
 .PHONY: build
-build: bin clean vendor fmt
-	go build ${flags} -o bin cmd/run.go
+build: bin clean vendor fmt build-run build-random
+
+.PHONY: build-run
+build-run:
+	go build ${flags} -o bin cmd/run/run.go
+
+.PHONY: build-random
+build-random:
+	go build ${flags} -o bin cmd/random/random.go
 
 bin:
 	mkdir -p bin
-
-.PHONY: docker-lint
-docker-lint:
-	docker run --rm -i ghcr.io/hadolint/hadolint < Dockerfile
 
 .PHONY: fmt
 fmt: staticcheck
