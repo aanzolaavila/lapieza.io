@@ -111,7 +111,7 @@ func processPrices(inCh <-chan []types.Price, outCh chan<- types.Price) {
 }
 
 func processPricesConcurrent(inCh <-chan []types.Price, outCh chan<- types.Price) {
-	const goroutines = 5
+	const goroutines = 4
 
 	var wg sync.WaitGroup
 	wg.Add(goroutines)
@@ -127,9 +127,9 @@ func processPricesConcurrent(inCh <-chan []types.Price, outCh chan<- types.Price
 }
 
 func ProcessPricesFromFile(file *os.File) (<-chan types.Price, <-chan error) {
-	inCh := make(chan []types.Price)
-	outCh := make(chan types.Price)
-	errs := make(chan error)
+	inCh := make(chan []types.Price, 5)
+	outCh := make(chan types.Price, 5)
+	errs := make(chan error, 5)
 
 	go func() {
 		streamPrices(file, inCh, errs)
