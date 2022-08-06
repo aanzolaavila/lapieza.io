@@ -26,9 +26,11 @@ Each line represents the stock window to be processed, each number in the line i
 #### How it works
 This program reads the file line by line, each is converted into a slice of `int64` numbers, each of those is fed into a channel `inCh`.
 
+If there is an error in reading the line of numbers, there is an `error` fed into the `errs` channel.
+
 Concurrently running in other goroutine, we read from that channel `inCh`, calculate the answer with a linear `O(n)` algorithm, then feed it into another channel `outCh`.
 
-Meanwhile in the main thread, we are reading from the `outCh` channel and print them in a FIFO manner. This means that the is NO guarantee for the order of the output as some slices could be larger than others and take longer to process.
+Meanwhile in the main thread, we are reading from the `outCh` and `errs` channel and print them in a FIFO manner. This means that the is NO guarantee for the order of the output as some slices could be larger than others and take longer to process.
 
 #### Running
 ```bash

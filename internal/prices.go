@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -54,7 +55,7 @@ func getPricesFromLine(line string) ([]types.Price, error) {
 func streamPrices(file *os.File, inCh chan<- []types.Price, errs chan<- error) {
 	scanner := bufio.NewScanner(file)
 
-	const maxCapacity int = 10 * 1024 * 1024 // 10 MB
+	const maxCapacity int = 600 * 1024 // 600 KB
 	buf := make([]byte, maxCapacity)
 	scanner.Buffer(buf, maxCapacity)
 
@@ -83,12 +84,8 @@ func streamPrices(file *os.File, inCh chan<- []types.Price, errs chan<- error) {
 }
 
 func calculateMaxEarnings(prices []types.Price) types.Price {
-	if len(prices) == 0 {
-		return 0
-	}
-
 	var maxDiff types.Price = 0
-	var minValue types.Price = prices[0]
+	var minValue types.Price = math.MaxInt64
 
 	for i := 0; i < len(prices); i++ {
 		if minValue > prices[i] {
