@@ -33,6 +33,7 @@ Meanwhile in the main thread, we are reading from the `outCh` channel and print 
 #### Running
 ```bash
 $ ./run --file in.txt
+$ cat in.txt | ./run
 ```
 **The `in.txt` file is included in this repo and includes two (2) example inputs.**
 

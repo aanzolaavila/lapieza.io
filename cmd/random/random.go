@@ -47,9 +47,9 @@ func getOptions() (Options, error) {
 	var options Options
 
 	flag.IntVar(&options.MinValue, "min", 0, "Minimum value to generate")
-	flag.IntVar(&options.MaxValue, "max", 1_000, "Maximum value to generate")
-	flag.IntVar(&options.Arrays, "arrays", rand.Intn(1_000_000)+1, "Number of arrays to generate")
-	flag.IntVar(&options.ArraySize, "size", rand.Intn(1_000)+1, "Maximum array size to generate")
+	flag.IntVar(&options.MaxValue, "max", 10_000, "Maximum value to generate")
+	flag.IntVar(&options.Arrays, "arrays", rand.Intn(1_000)+1, "Number of arrays to generate")
+	flag.IntVar(&options.ArraySize, "size", rand.Intn(100_000)+1, "Maximum array size to generate")
 
 	flag.Parse()
 
